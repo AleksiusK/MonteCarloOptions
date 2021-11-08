@@ -41,32 +41,23 @@ def main():
 
     ## Current iteration
     i = 0
-    while abs(c_err) >= 0.01:
+    while i <= 100:
         i += 1
         pths = paths((vars[0]), (vars[1]), (vars[2]), (vars[3]), (vars[4]), (vars[5]), int(vars[6]), iters)
         ##The profit at expiration
         call_payoffs = np.maximum(pths[-1] - vars[1], 0)
+        put_payoffs = np.maximum(vars[1] - pths[-1], 0)
         ##The mean over all profits in the matrix, discounted to present value
         c = np.mean(call_payoffs)*np.exp(-vars[3]*vars[2])
         cres.append(c)
-        if len(cres) >= 2:
-            c_err = (sum(cres) / len(cres)) - c
-        print("Call price, iteration {}: {}".format(i, c))
-        print("Error: {}".format(c_err))
-    ## Reset iteration
-    i = 0
-    while abs(p_err) >= 0.01:
-        i += 1
-        pths = paths((vars[0]), (vars[1]), (vars[2]), (vars[3]), (vars[4]), (vars[5]), int(vars[6]), iters)
-        ##The profit at expiration
-        put_payoffs = np.maximum(vars[1] - pths[-1], 0)
-        ##The mean over all profits in the matrix, discounted to present value
-        p = np.mean(put_payoffs)*np.exp(-vars[3]*vars[2])
+        p = np.mean(put_payoffs) * np.exp(-vars[3] * vars[2])
         pres.append(p)
-        if len(pres) >= 2:
+        if len(cres) != 0:
+            c_err = (sum(cres) / len(cres)) - c
             p_err = (sum(pres) / len(pres)) - p
-        print("Put price, iteration {}: {}".format(i, p))
-        print("Error: {}".format(p_err))
+        del pths
+        ##print("Call price, iteration {}: {}".format(i, c))
+        ##print("Error: {}".format(c_err))
 
     c_price = (sum(cres) / len(cres))
     p_price = (sum(pres) / len(pres))
